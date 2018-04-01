@@ -235,7 +235,7 @@ GPU* initGPU(uint32_t device_index, uint32_t id, uint32_t type) {
 		if (opt_platform_index == i) {
 			platform = platforms[i];
 			status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, NULL, &numDevices);
-			if (numDevices > 1) {
+			if (numDevices > 0) {
 				devices = (cl_device_id*)malloc(numDevices * sizeof(cl_device_id));
 				status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, numDevices, devices, NULL);
 				if (devices[device_index]) {
