@@ -1,5 +1,7 @@
 
 *.o
+*.bat
+*.bin
 
 .DS_Store
 autom4te.cache
