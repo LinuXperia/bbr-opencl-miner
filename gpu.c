@@ -359,9 +359,9 @@ void runGPU(GPU* gpu, uint32_t work_size, size_t offset, cl_ulong target)
 		cl_ulong targetArg = target;
 		err = clSetKernelArg(gpu->kernel, 4, sizeof(targetArg), &targetArg);
 		CHECK_OPENCL_ERROR(err, gpu->threadNumber);
-		err = clSetKernelArg(gpu->kernel, 5, 256 * 256, NULL);
+		err = clSetKernelArg(gpu->kernel, 5, 256, NULL);
 		CHECK_OPENCL_ERROR(err, gpu->threadNumber);
-		err = clSetKernelArg(gpu->kernel, 6, 256 * OUTPUT_SIZE * sizeof(cl_ulong), NULL);
+		err = clSetKernelArg(gpu->kernel, 6, OUTPUT_SIZE * sizeof(cl_ulong), NULL);
 		CHECK_OPENCL_ERROR(err, gpu->threadNumber);
 		err = clEnqueueNDRangeKernel(gpu->commandQueue, gpu->kernel, 1, &off, &num, NULL, 0, NULL, NULL);
 		CHECK_OPENCL_ERROR(err, gpu->threadNumber);
