@@ -113,7 +113,7 @@ inline ulong ROTL64_1(const ulong x, const uint y) { return (x << y | x >> (64-y
 
 #define MIX_ALL MIX(vstate0); MIX(vstate4); MIX(vstate8); MIX(vstate12); MIX(vstate16); MIX(vstate20);
 
-__kernel void search(__global const ulong *restrict in, __global ulong *restrict output, __global const ulong4 *restrict sp, const uint size, const ulong target)
+__kernel void search(__global const ulong *restrict in, __global long *restrict output, __global const ulong4 *restrict sp, const uint size, const ulong target)
 {
 	ulong nonce = get_global_id(0);
 	
@@ -153,6 +153,5 @@ __kernel void search(__global const ulong *restrict in, __global ulong *restrict
 	
 	LASTRND2();
 
-    if (state3 <= target)
-	    output[output[0x0F]++] = nonce;
+	output[state3 <= target ? output[0x0F]++ : -1] = nonce;
 }
