@@ -1,0 +1,54 @@
+FROM ubuntu:trusty
+
+# Install utilities
+RUN apt-get update --fix-missing && apt-get -y upgrade &&\
+apt-get install -y wget build-essential automake mingw-w64-x86-64-dev mingw-w64-tools mingw-w64 make
+
+# Download deps
+RUN wget http://curl.haxx.se/download/curl-7.40.0.tar.gz && tar zxf curl-7.40.0.tar.gz
+RUN wget ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz && tar zxf pthreads-w32-2-9-1-release.tar.gz
+
+RUN mkdir win64_deps
+
+# Build and install curl
+WORKDIR /curl-7.40.0
+RUN ls -l
+RUN ./configure --with-winssl --enable-static --prefix=/win64_deps --host=x86_64-w64-mingw32 --disable-shared
+RUN make install
+
+# build and install win32 pthreads
+WORKDIR /pthreads-w32-2-9-1-release
+RUN cp config.h pthreads_win32_config.h
+RUN make -f GNUmakefile CROSS="x86_64-w64-mingw32-" clean GC-static
+RUN cp libpthreadGC2.a /win64_deps/lib/libpthread.a
+RUN cp pthread.h semaphore.h sched.h /win64_deps/include
+
+WORKDIR /
+
+# Copy OpenCL
+COPY /OpenCL/ /OpenCL/ 
+
+# Copy files
+COPY /compat/ /compat/
+COPY autogen.sh /
+COPY bitops.h /
+COPY compat.h /
+COPY configure.ac /
+COPY cpu-miner.c /
+COPY elist.h /
+COPY gpu.c /
+COPY gpu.h /
+COPY helper.h /
+COPY Makefile.am /
+COPY miner.h /
+COPY minerd.1 /
+COPY reciprocal_div64.h /
+COPY util.c /
+COPY wild_keccak.cl /
+COPY wild_keccak_multi.cl /
+COPY wildkeccak.c /
+RUN autoreconf -fi -I/win64_deps/share/aclocal
+RUN ./configure --host=x86_64-w64-mingw32 \
+CFLAGS="-DWIN32 -DCURL_STATICLIB -O3 -I/win64_deps/include -I/OpenCL/include -DPTW32_STATIC_LIB" \
+--with-libcurl=/win64_deps LDFLAGS="-static -L/win64_deps/lib -L/OpenCL"
+RUN make
