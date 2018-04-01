@@ -113,13 +113,17 @@ inline ulong ROTL64_1(const ulong x, const uint y) { return (x << y | x >> (64-y
 
 #define MIX_ALL MIX(vstate0); MIX(vstate4); MIX(vstate8); MIX(vstate12); MIX(vstate16); MIX(vstate20);
 
-__kernel void search(__global const ulong *restrict in, __global long *restrict output, __global const ulong4 *restrict sp, const uint size, const ulong target)
+__kernel void search(__global const ulong *restrict in, __global long *restrict out, __global const ulong4 *restrict sp, const uint size, const ulong target, __local ulong *inBuffer, __local ulong *outBuffer)
 {
 	ulong nonce = get_global_id(0);
-	
-	ulong4 vstate0 = (ulong4)((nonce << 8) + (in[0] & 0xFF), (in[1] & 0xFFFFFFFFFFFFFF00U), in[2], in[3]);
-	ulong4 vstate4 = (ulong4)(in[4], in[5], in[6], in[7]);
-	ulong4 vstate8 = (ulong4)(in[8], in[9], (in[10] & 0xFF) + 256, 0);
+
+	inBuffer[get_local_id(0)] = in[get_global_id(0)];
+    outBuffer[get_local_id(0)] = out[get_global_id(0)];
+    mem_fence(CLK_LOCAL_MEM_FENCE);
+
+	ulong4 vstate0 = (ulong4)((nonce << 8) + (inBuffer[0] & 0xFF), (inBuffer[1] & 0xFFFFFFFFFFFFFF00U), inBuffer[2], inBuffer[3]);
+	ulong4 vstate4 = (ulong4)(inBuffer[4], inBuffer[5], inBuffer[6], inBuffer[7]);
+	ulong4 vstate8 = (ulong4)(inBuffer[8], inBuffer[9], (inBuffer[10] & 0xFF) + 256, 0);
 	ulong4 vstate12 = 0;
 	ulong4 vstate16 = (ulong4)(0x8000000000000000U, 0, 0, 0);
 	ulong4 vstate20 = 0;
@@ -128,7 +132,7 @@ __kernel void search(__global const ulong *restrict in, __global long *restrict 
 	ulong4 m;
 	ulong m4,m5, m6;
 	
-	#pragma unroll
+	#pragma unroll 23
 	for(int i = 0; i < 23; ++i) 
 	{
 		RND();
@@ -144,7 +148,7 @@ __kernel void search(__global const ulong *restrict in, __global long *restrict 
 	vstate20 = 0;
 	state24 = 0;
 	
-	#pragma unroll
+	#pragma unroll 23
 	for(int i = 0; i < 23; ++i) 
 	{
 		RND();
@@ -153,5 +157,6 @@ __kernel void search(__global const ulong *restrict in, __global long *restrict 
 	
 	LASTRND2();
 
-	output[state3 <= target ? output[0x0F]++ : -1] = nonce;
+	out[state3 <= target ? outBuffer[0x0F]++ : -1] = nonce;
+	mem_fence(CLK_GLOBAL_MEM_FENCE);
 }
