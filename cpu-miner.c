@@ -2562,7 +2562,7 @@ int main(int argc, char *argv[]) {
 	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
 	    if (opt_double_threads) {
             for (i = 0; i < opt_n_threads; i++) {
-                for (int j = 0; i < 4; j++) {
+                for (int j = 0; j < 4; j++) {
                     thr = &thr_info[i + j];
 
                     thr->gpu = initGPU(opt_device + i, i + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
