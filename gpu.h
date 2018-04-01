@@ -30,7 +30,7 @@ typedef struct {
 	uint32_t threadNumber;
 	uint32_t scratchpad_size;
 	bool update_scratchpad;
-}GPU;
+} GPU;
 
 int scanhash_wildkeccak_gpu(int thr_id, GPU *gpu, uint32_t *pdata, const uint32_t *ptarget, uint32_t max_nonce, unsigned long *hashes_done);
 void update_scratchpad_gpu(GPU *gpu, void* scratchpad, size_t size, int hashSize);
