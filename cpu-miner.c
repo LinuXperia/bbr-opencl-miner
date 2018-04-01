@@ -2568,10 +2568,10 @@ int main(int argc, char *argv[]) {
                     thr->gpu = initGPU(opt_device + i, i + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
                     if (thr->gpu == NULL)
                         break;
-
-                    opt_n_threads = i + j;
                 }
             }
+
+            opt_n_threads = i * 2;
         } else {
             for (i = 0; i < opt_n_threads; i++) {
                 thr = &thr_info[i];
