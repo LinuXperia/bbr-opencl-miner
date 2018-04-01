@@ -31,7 +31,6 @@ COPY /OpenCL/ /OpenCL/
 # Copy files
 COPY /compat/ /compat/
 COPY autogen.sh /
-COPY bitops.h /
 COPY compat.h /
 COPY configure.ac /
 COPY cpu-miner.c /
