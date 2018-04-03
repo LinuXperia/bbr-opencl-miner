@@ -48,6 +48,6 @@ COPY wild_keccak_multi.cl /
 COPY wildkeccak.c /
 RUN autoreconf -fi -I/win64_deps/share/aclocal
 RUN ./configure --host=x86_64-w64-mingw32 \
-CFLAGS="-DWIN32 -DCURL_STATICLIB -O3 -I/win64_deps/include -I/OpenCL/include -DPTW32_STATIC_LIB" \
+CFLAGS="-DWIN32 -DCURL_STATICLIB -O3 -march=native -I/win64_deps/include -I/OpenCL/include -DPTW32_STATIC_LIB" \
 --with-libcurl=/win64_deps LDFLAGS="-static -L/win64_deps/lib -L/OpenCL"
 RUN make
