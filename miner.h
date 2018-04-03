@@ -245,6 +245,7 @@ extern bool jsonrpc_2;
 extern char rpc2_id[65];
 
 #define WILD_KECCAK_SCRATCHPAD_BUFFSIZE  (384*1024*1024)
+
 struct  __attribute__((__packed__)) scratchpad_hi
 {
     unsigned char prevhash[32];
@@ -271,6 +272,8 @@ struct __attribute__((__packed__)) scratchpad_file_header
 
 
 extern volatile bool stratum_have_work;
+extern volatile bool need_to_rerequest_job;
+
 extern uint64_t* pscratchpad_buff;
 extern volatile uint64_t scratchpad_size;
 extern struct scratchpad_hi current_scratchpad_hi;
