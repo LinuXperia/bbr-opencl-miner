@@ -506,10 +506,11 @@ bool apply_addendum(uint64_t* padd_buff, size_t count/*uint64 units*/)
     for(int k = 0; k != count; k++)
         pscratchpad_buff[scratchpad_size+k] = padd_buff[k];
 
-    if (!opt_quiet) {
-        applog(LOG_INFO, "updating scratchpad; scratchpad_size: %zu", scratchpad_size);
-    }
     scratchpad_size += count;
+
+    if (!opt_quiet) {
+        applog(LOG_INFO, "updating scratchpad (apply); scratchpad_size: %u", scratchpad_size);
+    }
 
     update_scratchpad();
 
@@ -531,6 +532,10 @@ bool pop_addendum(struct addendums_array_entry* padd_entry)
     memcpy(&current_scratchpad_hi, &padd_entry->prev_hi, sizeof(padd_entry->prev_hi));
 
     memset(padd_entry, 0, sizeof(struct addendums_array_entry));
+
+    if (!opt_quiet) {
+        applog(LOG_INFO, "updating scratchpad (pop); scratchpad_size: %u", scratchpad_size);
+    }
 
     update_scratchpad();
 
@@ -1433,7 +1438,7 @@ static void *miner_thread(void *userdata) {
             while (!scratchpad_size || !stratum_have_work ||
                   (!jsonrpc_2 && time(NULL) >= g_work_time + 120)) {
                 if (!opt_quiet) {
-                    applog(LOG_INFO, "sleep 1; scratchpad_size: %zu, stratum_have_work: %d", scratchpad_size, stratum_have_work);
+                    applog(LOG_INFO, "sleep 1; scratchpad_size: %u, stratum_have_work: %d", scratchpad_size, stratum_have_work);
                 }
                 sleep(1);
             }
