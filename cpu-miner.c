@@ -506,6 +506,9 @@ bool apply_addendum(uint64_t* padd_buff, size_t count/*uint64 units*/)
     for(int k = 0; k != count; k++)
         pscratchpad_buff[scratchpad_size+k] = padd_buff[k];
 
+    if (!opt_quiet) {
+        applog(LOG_INFO, "updating scratchpad; scratchpad_size: %zu", scratchpad_size);
+    }
     scratchpad_size += count;
 
     update_scratchpad();
@@ -1429,6 +1432,9 @@ static void *miner_thread(void *userdata) {
         if (have_stratum) {
             while (!scratchpad_size || !stratum_have_work ||
                   (!jsonrpc_2 && time(NULL) >= g_work_time + 120)) {
+                if (!opt_quiet) {
+                    applog(LOG_INFO, "sleep 1; scratchpad_size: %zu, stratum_have_work: %d", scratchpad_size, stratum_have_work);
+                }
                 sleep(1);
             }
             pthread_mutex_lock(&g_work_lock);
