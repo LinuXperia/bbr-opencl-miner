@@ -423,7 +423,9 @@ void runGPU(GPU* gpu, uint32_t work_size, size_t offset, cl_ulong target)
 		CHECK_OPENCL_ERROR(err, gpu->threadNumber);
 	}
 
+	applog(LOG_INFO, "Before clFinish");
 	err = clFinish(gpu->commandQueue);
+	applog(LOG_INFO, "After clFinish");
 	CHECK_OPENCL_ERROR(err, gpu->threadNumber);
 }
 int scanhash_wildkeccak_gpu(int thr_id, GPU *gpu, uint32_t *pdata, const uint32_t *ptarget, uint32_t max_nonce, unsigned long *hashes_done)
