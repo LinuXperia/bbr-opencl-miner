@@ -2565,6 +2565,9 @@ int main(int argc, char *argv[]) {
         openlog("cpuminer", LOG_PID, LOG_USER);
 #endif
 
+    if (opt_double_threads)
+        opt_n_threads = opt_n_threads * 2;
+
     work_restart = calloc(opt_n_threads, sizeof(*work_restart));
     if (!work_restart)
         return 1;
@@ -2588,8 +2591,6 @@ int main(int argc, char *argv[]) {
                         break;
                 }
             }
-
-            opt_n_threads = i * 2;
         } else {
             for (i = 0; i < opt_n_threads; i++) {
                 thr = &thr_info[i];
@@ -2598,8 +2599,6 @@ int main(int argc, char *argv[]) {
                 if (thr->gpu == NULL)
                     break;
             }
-
-            opt_n_threads = i;
         }
 	}
 
