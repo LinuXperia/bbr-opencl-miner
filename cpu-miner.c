@@ -1553,7 +1553,7 @@ static void *miner_thread(void *userdata) {
 
 out: tq_freeze(mythr->q);
 
-    return NULL ;
+    return NULL;
 }
 
 static void restart_threads(void) {
@@ -2566,7 +2566,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     if (opt_double_threads)
-        opt_n_threads = opt_n_threads * 4;
+        opt_n_threads = opt_n_threads * 2;
 
     work_restart = calloc(opt_n_threads, sizeof(*work_restart));
     if (!work_restart)
@@ -2582,8 +2582,8 @@ int main(int argc, char *argv[]) {
 
 	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
 	    if (opt_double_threads) {
-            for (i = 0; i < (opt_n_threads / 4); i++) {
-                for (int j = 0; j < 4; j++) {
+            for (i = 0; i < (opt_n_threads / 2); i++) {
+                for (int j = 0; j < 2; j++) {
                     thr = &thr_info[i + j];
 
                     thr->gpu = initGPU(opt_device + i, i + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
