@@ -2582,7 +2582,7 @@ int main(int argc, char *argv[]) {
 
 	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
 	    if (opt_double_threads) {
-            for (i = 0; i < opt_n_threads; i++) {
+            for (i = 0; i < (opt_n_threads / 2); i++) {
                 for (int j = 0; j < 2; j++) {
                     thr = &thr_info[i + j];
 
