@@ -222,7 +222,6 @@ struct work_restart {
 };
 
 extern int opt_work_size;
-
 extern int opt_platform_index;
 extern bool opt_debug;
 extern bool opt_protocol;

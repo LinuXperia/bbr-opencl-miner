@@ -115,7 +115,8 @@ static const char *algo_names[] = {
     [ALGO_WILD_KECCAK_OCL_MULTISTEP] = "wildkeccak_ocl_multistep",
 };
 
-int opt_device = 0;
+int opt_device[19] = {0};
+int opt_devices = 1;
 int opt_work_size = (1 << 18);
 double total_probability = 0.0;
 uint64_t total_hashes_done = 0;
@@ -211,7 +212,7 @@ static char const usage[] =
     wildkeccak_ocl_multistep   WildKeccak OpenCL multistep\n\
     --platform_index=N  OpenCL platform index to use (default: 0) \n\
     --double_threads    Use two threads per gpu \n\
-    -d  --device=N  start OpenCL device to use (default: 0) \n\
+    -d  --device=N,N,N...  list of OpenCL devices to use (default: 0) \n\
     -i  --intensity=N  OpenCL work intensity (default: 18) \n\
     -k  --scratchpad=URL  URL of inital scratchpad file\n\
     -l  --scratchpad_local_cache=PATH  PATH to local scratchpad file\n\
@@ -221,7 +222,6 @@ static char const usage[] =
     -p, --pass=PASSWORD   password for mining server\n\
     --cert=FILE       certificate for mining server using SSL\n\
     -x, --proxy=[PROTOCOL://]HOST[:PORT]  connect through a proxy\n\
-    -t, --threads=N       number of miner threads (default: number of processors)\n\
     -r, --retries=N       number of times to retry if a network call fails\n\
     (default: retry indefinitely)\n\
     -R, --retry-pause=N   time to pause between retries, in seconds (default: 30)\n\
@@ -256,7 +256,7 @@ static char const short_options[] =
 #ifdef HAVE_SYSLOG_H
     "S"
 #endif
-    "i:d:a:c:Dhp:Px:qr:R:s:t:T:o:u:O:V:k:l:";
+    "i:d:a:c:Dhp:Px:qr:R:s:T:o:u:O:V:k:l:";
 
 static struct option const options[] = {
     { "algo", 1, NULL, 'a' },
@@ -285,7 +285,6 @@ static struct option const options[] = {
 #ifdef HAVE_SYSLOG_H
     { "syslog", 0, NULL, 'S' },
 #endif
-    { "threads", 1, NULL, 't' },
     { "timeout", 1, NULL, 'T' },
     { "url", 1, NULL, 'o' },
     { "user", 1, NULL, 'u' },
@@ -2091,10 +2090,14 @@ static void parse_arg(int key, char *arg) {
 
     switch (key) {
     case 'd':
-        v = atoi(arg);
-        if (v < 0) /* sanity check */
-            show_usage_and_exit(1);
-        opt_device = v;
+        p = strtok(arg, ",");
+        opt_devices = 0;
+
+        while (p) {
+          opt_device[opt_devices++] = atoi(p);
+          p = strtok(NULL, ",");
+        }
+
         break;
     case 'i':
         v = atoi(arg);
@@ -2172,12 +2175,6 @@ static void parse_arg(int key, char *arg) {
         if (v < 1 || v > 99999) /* sanity check */
             show_usage_and_exit(1);
         opt_timeout = v;
-        break;
-    case 't':
-        v = atoi(arg);
-        if (v < 1 || v > 9999) /* sanity check */
-            show_usage_and_exit(1);
-        opt_n_threads = v;
         break;
     case 2000:
         v = atoi(arg);
@@ -2555,18 +2552,18 @@ int main(int argc, char *argv[]) {
     if (num_processors < 1)
         num_processors = 1;
     if (!opt_n_threads)
-    	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP)
-    		opt_n_threads = 1;
-    	else
-    		opt_n_threads = num_processors;
+       if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP)
+               opt_n_threads = 1;
+       else
+               opt_n_threads = num_processors;
 
 #ifdef HAVE_SYSLOG_H
     if (use_syslog)
         openlog("cpuminer", LOG_PID, LOG_USER);
 #endif
 
-    if (opt_double_threads)
-        opt_n_threads = opt_n_threads * 2;
+    if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP)
+        opt_n_threads = opt_n_threads * opt_double_threads ? 2 : 1;
 
     work_restart = calloc(opt_n_threads, sizeof(*work_restart));
     if (!work_restart)
@@ -2581,21 +2578,11 @@ int main(int argc, char *argv[]) {
         return 1;
 
 	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
-	    if (opt_double_threads) {
-            for (i = 0; i < (opt_n_threads / 2); i++) {
-                for (int j = 0; j < 2; j++) {
-                    thr = &thr_info[i + j];
+        for (i = 0; i < opt_devices; i++) {
+            for (int j = 0; j < opt_double_threads ? 2 : 1; j++) {
+                thr = &thr_info[i + j];
 
-                    thr->gpu = initGPU(opt_device + i, i + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
-                    if (thr->gpu == NULL)
-                        break;
-                }
-            }
-        } else {
-            for (i = 0; i < opt_n_threads; i++) {
-                thr = &thr_info[i];
-
-                thr->gpu = initGPU(opt_device + i, i, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
+                thr->gpu = initGPU(opt_device[i], i + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
                 if (thr->gpu == NULL)
                     break;
             }
