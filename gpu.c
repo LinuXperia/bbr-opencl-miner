@@ -198,7 +198,6 @@ cl_mem DeviceMalloc(cl_context m_context, size_t size)
 
 void CopyBufferToDevice(cl_command_queue queue, cl_mem buffer, void* h_Buffer, size_t size)
 {
-
 	cl_int err = clEnqueueWriteBuffer (queue, buffer, CL_TRUE, 0, size, h_Buffer, 0, NULL, NULL);
 	CHECK_OPENCL_ERROR(err, 0);
 }
@@ -423,9 +422,7 @@ void runGPU(GPU* gpu, uint32_t work_size, size_t offset, cl_ulong target)
 		CHECK_OPENCL_ERROR(err, gpu->threadNumber);
 	}
 
-	applog(LOG_INFO, "Before clFinish");
 	err = clFinish(gpu->commandQueue);
-	applog(LOG_INFO, "After clFinish");
 	CHECK_OPENCL_ERROR(err, gpu->threadNumber);
 }
 int scanhash_wildkeccak_gpu(int thr_id, GPU *gpu, uint32_t *pdata, const uint32_t *ptarget, uint32_t max_nonce, unsigned long *hashes_done)
