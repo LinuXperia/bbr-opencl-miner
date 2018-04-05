@@ -144,7 +144,7 @@ static int opt_scantime = 5;
 static json_t *opt_config;
 static const bool opt_time = true;
 static enum mining_algo opt_algo = ALGO_WILD_KECCAK_OCL;
-int opt_n_threads;
+static int opt_n_threads;
 static int num_processors;
 static char *rpc_url;
 static char *rpc_userpass;
@@ -2549,11 +2549,13 @@ int main(int argc, char *argv[]) {
 #else
     num_processors = 1;
 #endif
+    int threads_per_gpu = opt_double_threads ? 2 : 1;
+
     if (num_processors < 1)
         num_processors = 1;
     if (!opt_n_threads)
        if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP)
-               opt_n_threads = 1;
+               opt_n_threads = opt_devices * threads_per_gpu;
        else
                opt_n_threads = num_processors;
 
@@ -2561,12 +2563,6 @@ int main(int argc, char *argv[]) {
     if (use_syslog)
         openlog("cpuminer", LOG_PID, LOG_USER);
 #endif
-
-    int threads_per_gpu = opt_double_threads ? 2 : 1;
-
-    if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
-        opt_n_threads = opt_n_threads * threads_per_gpu;
-    }
 
     work_restart = calloc(opt_n_threads, sizeof(*work_restart));
     if (!work_restart)
