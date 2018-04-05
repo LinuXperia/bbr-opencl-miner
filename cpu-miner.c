@@ -2577,9 +2577,11 @@ int main(int argc, char *argv[]) {
     if (!thr_hashrates)
         return 1;
 
+    int threads_per_gpu = opt_double_threads ? 2 : 1;
+
 	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
         for (i = 0; i < opt_devices; i++) {
-            for (int j = 0; j < opt_double_threads ? 2 : 1; j++) {
+            for (int j = 0; j < threads_per_gpu; j++) {
                 thr = &thr_info[i + j];
 
                 thr->gpu = initGPU(opt_device[i], i + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
