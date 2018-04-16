@@ -211,7 +211,7 @@ static char const usage[] =
     wildkeccak_ocl   WildKeccak OpenCL\n\
     wildkeccak_ocl_multistep   WildKeccak OpenCL multistep\n\
     --platform_index=N  OpenCL platform index to use (default: 0) \n\
-    --double_threads    Use two threads per gpu \n\
+    --double_threads    Use two threads per gpu/cpu \n\
     -d  --device=N,N,N...  list of OpenCL devices to use (default: 0) \n\
     -i  --intensity=N  OpenCL work intensity (default: 18) \n\
     -k  --scratchpad=URL  URL of inital scratchpad file\n\
@@ -2549,15 +2549,15 @@ int main(int argc, char *argv[]) {
 #else
     num_processors = 1;
 #endif
-    int threads_per_gpu = opt_double_threads ? 2 : 1;
+    int threads_multiplier = opt_double_threads ? 2 : 1;
 
     if (num_processors < 1)
         num_processors = 1;
     if (!opt_n_threads)
        if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP)
-               opt_n_threads = opt_devices * threads_per_gpu;
+               opt_n_threads = opt_devices * threads_multiplier;
        else
-               opt_n_threads = num_processors;
+               opt_n_threads = num_processors * threads_multiplier;
 
 #ifdef HAVE_SYSLOG_H
     if (use_syslog)
@@ -2578,10 +2578,10 @@ int main(int argc, char *argv[]) {
 
 	if (opt_algo == ALGO_WILD_KECCAK_OCL || opt_algo == ALGO_WILD_KECCAK_OCL_MULTISTEP) {
         for (i = 0; i < opt_devices; i++) {
-            for (int j = 0; j < threads_per_gpu; j++) {
-                thr = &thr_info[(i * threads_per_gpu) + j];
+            for (int j = 0; j < threads_multiplier; j++) {
+                thr = &thr_info[(i * threads_multiplier) + j];
 
-                thr->gpu = initGPU(opt_device[i], (i * threads_per_gpu) + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
+                thr->gpu = initGPU(opt_device[i], (i * threads_multiplier) + j, opt_algo == ALGO_WILD_KECCAK_OCL ? 0 : 1);
                 if (thr->gpu == NULL)
                     break;
             }
