@@ -1,4 +1,4 @@
-CPUMiner-Multi-OpenCL
+bbr-opencl-miner
 ==============
 
 This is a multi-threaded OpenCL/CPU miner,
@@ -127,13 +127,13 @@ When the --proxy option is not used, the program honors the http_proxy and all_p
 
 Donations
 =========
-Donations for the work done in this fork by mbk are accepted at
+Donations for the work done in this fork are accepted at
+* BBR: `@robert`
 * BBR: `@mbk`
-* BTC: `1Lns6UjL3sw77DJ5z1EKJZy6SnqriqvVGK`
 
 Credits
 =======
-CPUMiner-Multi-OpenCL was forked from Cryptozoidberg's cpuminer-multi, and has been developed by Mikhail Kuperman (mbk.git@gmail.com).
+CPUMiner-Multi-OpenCL was forked from Cryptozoidberg's cpuminer-multi, and has been developed by Mikhail Kuperman (mbk.git@gmail.com) and Robert Arnesson.
 
 License
 =======
