@@ -6,27 +6,84 @@ fork of [pooler](//github.com/pooler)'s cpuminer.
 
 #### Table of contents
 
-* [Algorithms](#algorithms)
-* [Dependencies](#dependencies)
-* [Download](#download)
-* [Build](#build)
-* [Usage instructions](#usage-instructions)
+* [Usage](#usage)
+* [Easy build instructions](#build)
+* [Original build instructions](#build-old)
 * [Donations](#donations)
 * [Credits](#credits)
 * [License](#license)
 
-Algorithms
-==========
- * ✓ __wildkeccak__ (Boolberry [BBR])
 
-Dependencies
+Usage
+==================
+
+Always specify local scratchpad file (ex. -l scratchpad.bin)!
+
+To mine on the first available GPU:
+```
+minerd -a wildkeccak_ocl -o stratum+tcp://url_to_server:7777 -u 1EmWGnwhydr3S2vRWQbbefh1hgDKgMjdMGe43ZgdPhdARhNBRkUMuD4YzLA2nyYG8tg2HKCCBg4aDamJKypRQWW1Ca2kSV8 -p X -l scratchpad.bin -k http://url_to_server/download/scratchpad.bin
+```
+
+OpenCL specific options:
+```
+-d N,N,N... - OpenCL devices to use (default: 0)
+-i N - OpenCL work intensity (default: 18)
+```
+
+To mine on 2nd GPU only more intensive:
+```
+minerd -a wildkeccak_ocl -d 1 -t 1 -i 22 ...
+```
+
+To mine on CPU (algorithm from original fork):
+```
+minerd -a wildkeccak ... 
+```
+
+
+Run "minerd --help" to see all options.
+
+
+
+### Connecting through a proxy
+
+
+
+Use the --proxy option.
+
+To use a SOCKS proxy, add a socks4:// or socks5:// prefix to the proxy host  
+Protocols socks4a and socks5h, allowing remote name resolving, are also available since libcurl 7.18.0.
+
+If no protocol is specified, the proxy is assumed to be a HTTP proxy.  
+When the --proxy option is not used, the program honors the http_proxy and all_proxy environment variables.
+
+
+
+Easy build instructions
 ============
+
+#### Dependencies
+* Docker			https://docker.com
+
+#### Build Win64
+sh build_win64.sh
+
+#### Build Linux
+sh build_linux.sh
+
+#### Building and running in Docker (e.g. for testing)
+sh run.sh
+
+
+
+Original build instructions
+=====
+
+#### Dependencies
 * libcurl			http://curl.haxx.se/libcurl/
 * jansson			http://www.digip.org/jansson/ (jansson is included in-tree)
-* openssl           https://www.openssl.org/
+* openssl     https://www.openssl.org/
 
-Build
-=====
 
 Important: edit 1st line of Makefile.am if you have OpenCL headers in different directory.
 
@@ -81,49 +138,7 @@ make
      * Windows supports AVX starting from Windows 7 SP1 and Windows Server 2008 R2 SP1.
    * The configure script outputs a warning if the assembler doesn't support some instruction sets. In that case, the miner can still be built, but unavailable optimizations are left off.
 
-Usage instructions
-==================
 
-Copy *.cl kernel files to executable's directory.
-Always specify local scratchpad file (ex. -l scratchpad.bin)!
-
-To mine on all available GPUs:
-```
-minerd -a wildkeccak_ocl -o stratum+tcp://url_to_server:7777 -u 1EmWGnwhydr3S2vRWQbbefh1hgDKgMjdMGe43ZgdPhdARhNBRkUMuD4YzLA2nyYG8tg2HKCCBg4aDamJKypRQWW1Ca2kSV8 -p X -l scratchpad.bin -k http://url_to_server/download/scratchpad.bin
-```
-
-OpenCL specific options:
-```
--d N - start OpenCL device to use (default: 0)
--i N - OpenCL work intensity (default: 18)
-```
-
-To mine on 2nd GPU only more intensive:
-```
-minerd -a wildkeccak_ocl -d 1 -t 1 -i 22 ...
-```
-
-To mine on CPU (algorithm from original fork):
-```
-minerd -a wildkeccak ... 
-```
-
-
-Run "minerd --help" to see all options.
-
-
-
-### Connecting through a proxy
-
-
-
-Use the --proxy option.
-
-To use a SOCKS proxy, add a socks4:// or socks5:// prefix to the proxy host  
-Protocols socks4a and socks5h, allowing remote name resolving, are also available since libcurl 7.18.0.
-
-If no protocol is specified, the proxy is assumed to be a HTTP proxy.  
-When the --proxy option is not used, the program honors the http_proxy and all_proxy environment variables.
 
 Donations
 =========
