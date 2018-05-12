@@ -32,7 +32,7 @@ OpenCL specific options:
 
 To mine on 2nd GPU only more intensive:
 ```
-minerd -a wildkeccak_ocl -d 1 -t 1 -i 22 ...
+minerd -a wildkeccak_ocl -d 1 -i 22 ...
 ```
 
 To mine on CPU (algorithm from original fork):
